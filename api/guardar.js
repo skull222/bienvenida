@@ -11,10 +11,11 @@ module.exports = async (req, res) => {
         return res.status(405).json({ error: "Método no permitido" });
     }
 
-    // Adaptado a los atributos 'name' exactos de tu formulario index.html
+    // Capturamos los campos exactos enviados por index_2.html
     const {
         fecha,
         reunion,
+        persona,        // <-- Nuevo campo agregado
         asignado_a,
         numero_papeleta,
         nombre_persona,
@@ -23,27 +24,29 @@ module.exports = async (req, res) => {
     } = req.body;
 
     try {
-        // Asegúrate de que los nombres de las columnas coincidan con tu tabla en la base de datos
+        // Añadimos la columna 'persona' a nuestra consulta estructurada
         const query = `
             INSERT INTO reuniones (
                 fecha, 
                 reunion, 
+                persona,
                 asignado_a, 
                 numero_papeleta, 
                 nombre_persona,
                 respuesta_casa, 
                 porque
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         `;
 
         await pool.query(query, [
             fecha,
             reunion,
+            persona,                        // <-- Enviamos el valor del select
             asignado_a,
-            numero_papeleta || null, // Si viene vacío, guarda NULL en la base de datos
+            numero_papeleta || null,        // Si viene vacío, guarda NULL en la BD
             nombre_persona,
             respuesta_si_no,
-            porque
+            porque || null                  // Al ya no ser requerido en el HTML, guardamos NULL si está vacío
         ]);
 
         res.status(200).json({ mensaje: "Formulario guardado correctamente" });
