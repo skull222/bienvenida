@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Formulario de Registro</title>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Registro de Reunión</h2>
+    <form id="formulario" method="POST">
+        
+        <!-- Campo: Fecha -->
+        <div class="form-group">
+            <label for="fecha">Fecha:</label>
+            <input type="date" id="fecha" name="fecha" required>
+        </div>
+
+        <!-- Campo: Reunión (Botones funcionales) -->
+        <div class="form-group">
+            <label>Reunión:</label>
+            <div class="btn-group">
+                <input type="radio" id="reunion-1" name="reunion" value="1ra" required>
+                <label for="reunion-1">1ra</label>
+
+                <input type="radio" id="reunion-2" name="reunion" value="2da">
+                <label for="reunion-2">2da</label>
+
+                <input type="radio" id="reunion-3" name="reunion" value="3ra">
+                <label for="reunion-3">3ra</label>
+            </div>
+        </div>
+
+        <!-- Campo: Se le asignó a -->
+        <div class="form-group">
+            <label for="asignado_a">Se le asignó a:</label>
+            <input type="text" id="asignado_a" name="asignado_a" placeholder="Nombre del responsable" required>
+        </div>
+
+        <!-- Campo: Número de papeleta -->
+        <div class="form-group">
+            <label for="numero_papeleta">Número de papeleta:</label>
+            <input type="text" id="numero_papeleta" name="numero_papeleta" placeholder="#2" >
+        </div>
+
+        <!-- Campo: Nombre de la persona -->
+        <div class="form-group">
+            <label for="nombre_persona">Nombre de la persona:</label>
+            <input type="text" id="nombre_persona" name="nombre_persona" placeholder="Nombre completo" required>
+        </div>
+
+        <!-- Campo: Decisión (Botones Sí / No) -->
+        <div class="form-group">
+            <label>¿Le gustaria una casa de estudio? (Seleccione una opción):</label>
+            <div class="btn-group">
+                <input type="radio" id="respuesta-si" name="respuesta_si_no" value="si" required>
+                <label for="respuesta-si">Sí</label>
+
+                <input type="radio" id="respuesta-no" name="respuesta_si_no" value="no">
+                <label for="respuesta-no">No</label>
+            </div>
+        </div>
+
+        <!-- Campo: Porque -->
+        <div class="form-group">
+            <label for="porque">¿Por qué?</label>
+            <textarea id="porque" name="porque" placeholder="Justificación o motivos..." required></textarea>
+        </div>
+
+        <!-- Botón de envío -->
+        <button id="submit" type="submit" class="submit-btn">Enviar Formulario</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('formulario').addEventListener('submit', async (e) => {
+        e.preventDefault(); // Evita que la página se recargue por defecto
+
+        // Convierte los campos del formulario en un objeto JSON automáticamente
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            // Enviamos los datos directamente a la API interna de Vercel
+            const response = await fetch('/api/registro', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert('¡Datos registrados correctamente en Vercel Postgres!');
+                e.target.reset(); // <--- IMPORTANTE: Limpia todos los botones y campos de texto
+            } else {
+                const errData = await response.json();
+                alert('Error en el servidor: ' + (errData.error || 'No se pudo guardar.'));
+            }
+        } catch (error) {
+            console.error('Error de conexión:', error);
+            alert('No se pudo establecer conexión con el servidor.');
+        }
+    });
+</script>
+</body>
+</html>
